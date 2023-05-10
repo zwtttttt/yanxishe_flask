@@ -70,12 +70,13 @@ def get_count():
 @app.route('/message', methods=['POST'])
 def response_message():
     data = request.json
+    
     response_json = {
         "ToUserName": data.get("FromUserName"),
         "FromUserName": data.get("ToUserName"),
         "CreateTime": data.get("CreateTime"),
         "MsgType": "text",
-        "Content": data.get("Content")
+        "Content": f"{data.get('Content')} ~"
     }
 
     return Response(json.dumps(response_json, ensure_ascii=False), mimetype='application/json')
