@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import requests
 from flask import render_template, request, Response
 from run import app
 from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter, update_counterbyid
@@ -71,12 +72,27 @@ def get_count():
 def response_message():
     data = request.json
     
+    url = "http://danto.cloud:12138/api/chat"
+    input = {
+        'message': data.get('Content')
+    }
+    output = ''
+    
+    response = requests.post(url, json=data, stream=True)
+    if response.status_code == 200:
+        data = response.json()
+        content_list = [d['content'] for d in data if d['isSuccessful'] and d['content']]
+        content_str = ''.join(content_list)
+        output = content_str
+    else:
+        output = '请求失败啦'
+
     response_json = {
         "ToUserName": data.get("FromUserName"),
         "FromUserName": data.get("ToUserName"),
         "CreateTime": data.get("CreateTime"),
         "MsgType": "text",
-        "Content": f"{data.get('Content')} ~"
+        "Content": output
     }
 
     return Response(json.dumps(response_json, ensure_ascii=False), mimetype='application/json')
