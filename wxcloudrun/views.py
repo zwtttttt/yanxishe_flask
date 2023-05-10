@@ -85,7 +85,7 @@ def response_message():
         content_str = ''.join(content_list)
         output = content_str
     else:
-        output = '请求失败啦'
+        output = str(response.text)
 
     response_json = {
         "ToUserName": data.get("FromUserName"),
