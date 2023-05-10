@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import render_template, request
+import json
+from flask import render_template, request, Response
 from run import app
 from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter, update_counterbyid
 from wxcloudrun.model import Counters
@@ -64,3 +65,17 @@ def get_count():
     """
     counter = Counters.query.filter(Counters.id == 1).first()
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
+
+
+@app.route('/message', methods=['POST'])
+def response_message():
+    data = request.json
+    response_json = {
+        "ToUserName": data.get("FromUserName"),
+        "FromUserName": data.get("ToUserName"),
+        "CreateTime": data.get("CreateTime"),
+        "MsgType": "text",
+        "Content": data.get("Content")
+    }
+
+    return Response(json.dumps(response_json, ensure_ascii=False), mimetype='application/json')
