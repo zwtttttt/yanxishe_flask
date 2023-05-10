@@ -78,8 +78,8 @@ def response_message():
     
     response = requests.post(url, json=input, stream=True)
     if response.status_code == 200:
-        data = response.json()
-        content_list = [d['content'] for d in data if d['isSuccessful'] and d['content']]
+        response_data = response.json()
+        content_list = [d['content'] for d in response_data if d['isSuccessful'] and d['content']]
         content_str = ''.join(content_list)
         output = content_str
     else:
