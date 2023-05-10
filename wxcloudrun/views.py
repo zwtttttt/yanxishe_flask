@@ -73,12 +73,10 @@ def response_message():
     data = request.json
     
     url = "http://danto.cloud:12138/api/chat"
-    input = {
-        'message': data.get('Content')
-    }
+    input = {'message': data.get('Content')}
     output = ''
     
-    response = requests.post(url, json=data, stream=True)
+    response = requests.post(url, json=input, stream=True)
     if response.status_code == 200:
         data = response.json()
         content_list = [d['content'] for d in data if d['isSuccessful'] and d['content']]
