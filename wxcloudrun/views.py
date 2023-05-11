@@ -72,25 +72,25 @@ def get_count():
 def response_message():
     data = request.json
     
-    url = "http://danto.cloud:12138/api/chat"
-    input = {'message': data.get('Content')}
-    output = ''
+    # url = "http://danto.cloud:12138/api/chat"
+    # input = {'message': data.get('Content')}
+    # output = ''
     
-    response = requests.post(url, json=input, stream=True)
-    if response.status_code == 200:
-        response_data = response.json()
-        content_list = [d['content'] for d in response_data if d['isSuccessful'] and d['content']]
-        content_str = ''.join(content_list)
-        output = content_str
-    else:
-        output = str(response.text)
+    # response = requests.post(url, json=input, stream=True)
+    # if response.status_code == 200:
+    #     response_data = response.json()
+    #     content_list = [d['content'] for d in response_data if d['isSuccessful'] and d['content']]
+    #     content_str = ''.join(content_list)
+    #     output = content_str
+    # else:
+    #     output = str(response.text)
 
     response_json = {
         "ToUserName": data.get("FromUserName"),
         "FromUserName": data.get("ToUserName"),
         "CreateTime": data.get("CreateTime"),
         "MsgType": "text",
-        "Content": output
+        "Content": data.get('Content') + "~"
     }
 
     return Response(json.dumps(response_json, ensure_ascii=False), mimetype='application/json')
