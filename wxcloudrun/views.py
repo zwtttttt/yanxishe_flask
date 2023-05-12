@@ -1,11 +1,11 @@
 from datetime import datetime
-import json
-import requests
 from flask import render_template, request, Response
 from run import app
 from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter, update_counterbyid
 from wxcloudrun.model import Counters
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
+
+import requests
 
 
 @app.route('/')
@@ -68,29 +68,26 @@ def get_count():
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
 
 
-@app.route('/message', methods=['POST'])
-def response_message():
-    data = request.json
-    
-    # url = "http://danto.cloud:12138/api/chat"
-    # input = {'message': data.get('Content')}
-    # output = ''
-    
-    # response = requests.post(url, json=input, stream=True)
-    # if response.status_code == 200:
-    #     response_data = response.json()
-    #     content_list = [d['content'] for d in response_data if d['isSuccessful'] and d['content']]
-    #     content_str = ''.join(content_list)
-    #     output = content_str
-    # else:
-    #     output = str(response.text)
 
-    response_json = {
-        "ToUserName": data.get("FromUserName"),
-        "FromUserName": data.get("ToUserName"),
-        "CreateTime": data.get("CreateTime"),
-        "MsgType": "text",
-        "Content": data.get('Content') + "~"
+@app.route('/chat/<string:message>', methods=['POST'])
+def chat(message: str):
+    url = "http://danto.cloud:12138/api/chat"
+    headers = {"Content-Type": "application/json"}
+
+    data = {
+        'message': message,
+        # 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
+        # 'apiKey': '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'
     }
+    
 
-    return Response(json.dumps(response_json, ensure_ascii=False), mimetype='application/json')
+    def generate():
+        import time
+        start = time.time()
+        while True and time.time() - start >= 4:
+            with requests.post(url, headers=headers, json=data, stream=True) as response:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if time.time() - start >= 4: break
+                    yield chunk.decode()
+        
+    return Response(generate(), content_type='text/event-stream')
